@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Reply Generator Settings</title>
+        <style>
+            :root {
+                color-scheme: light dark;
+                --bg: #ffffff; --fg: #0f1419; --muted: #536471; --line: #cfd9de; --soft: #f7f9f9; --accent: #1d9bf0;
+                --ok: #00ba7c; --danger: #f4212e;
+            }
+            @media (prefers-color-scheme: dark) {
+                :root { --bg: #000000; --fg: #e7e9ea; --muted: #71767b; --line: #2f3336; --soft: #16181c; }
+            }
+            body { margin: 0; background: var(--bg); color: var(--fg);
+                font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+            main { max-width: 640px; margin: 0 auto; padding: 40px 16px 80px; }
+            h1 { font-size: 22px; margin: 0 0 4px; }
+            h2 { font-size: 17px; margin: 0 0 4px; }
+            h3 { font-size: 14px; margin: 20px 0 6px; }
+            p { margin: 0 0 12px; color: var(--muted); font-size: 14px; }
+            section { padding: 24px 0; border-top: 1px solid var(--line); }
+            label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px; }
+            .hint { font-weight: 400; color: var(--muted); }
+            input[type="password"], input[type="text"], select, textarea {
+                width: 100%; box-sizing: border-box; padding: 8px 12px; border: 1px solid var(--line);
+                border-radius: 8px; background: var(--bg); color: var(--fg); font: inherit; }
+            input[type="password"], input[type="text"], select { height: 40px; }
+            textarea { resize: vertical; min-height: 72px; line-height: 1.45; }
+            #style-prompt { min-height: 280px; font: 13px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; }
+            input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+            .field + .field { margin-top: 16px; }
+            .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+            @media (max-width: 520px) { .grid { grid-template-columns: 1fr; } }
+            .check { display: flex; align-items: center; gap: 8px; font-weight: 400; margin-top: 16px; }
+            .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+            button { height: 36px; padding: 0 16px; border-radius: 999px; font: inherit; font-weight: 700; font-size: 14px; cursor: pointer; }
+            .primary { border: 0; background: var(--fg); color: var(--bg); }
+            .secondary { border: 1px solid var(--line); background: transparent; color: var(--fg); }
+            .link { border: 0; background: none; padding: 0; height: auto; color: var(--accent); font-weight: 400; }
+            button:disabled { opacity: 0.5; cursor: default; }
+            button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+            .msg { font-size: 14px; }
+            .msg.ok { color: var(--ok); }
+            .msg.err { color: var(--danger); }
+            .card { background: var(--soft); border: 1px solid var(--line); border-radius: 12px; padding: 16px; margin-top: 16px; }
+            .card h3 { margin-top: 0; }
+            .reply { margin-top: 10px; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); }
+            .reply:empty { display: none; }
+            .note { font-size: 13px; color: var(--muted); margin-top: 8px; }
+            a { color: var(--accent); }
+        </style>
+    </head>
+    <body>
+        <main>
+            <h1>Reply Generator</h1>
+            <p>Click <b>Reply idea</b> under any post on x.com to get a short reply in your style. You copy and post it yourself.</p>
+
+            <section>
+                <h2>1. API key</h2>
+                <p>
+                    Get one at <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">console.anthropic.com</a>.
+                    It's pay-as-you-go, about $0.0002 per reply. A Claude Pro or Max subscription doesn't work here.
+                </p>
+                <div class="field">
+                    <label for="key">Anthropic API key</label>
+                    <input id="key" type="password" autocomplete="off" spellcheck="false" placeholder="sk-ant-…" />
+                </div>
+                <div class="field">
+                    <label for="model">Model</label>
+                    <select id="model"></select>
+                </div>
+                <div class="row">
+                    <button id="save-key" class="primary" type="button">Save key</button>
+                    <button id="test" class="secondary" type="button">Test key</button>
+                    <span id="api-msg" class="msg" role="status"></span>
+                </div>
+                <p class="note">The key stays in this Chrome profile, unencrypted on this computer, and is sent only to api.anthropic.com. Tip: use a separate key with a monthly spend limit.</p>
+            </section>
+
+            <section>
+                <h2>2. Your reply style</h2>
+                <p>Describe how you reply, paste a few replies you really wrote, and generate a style. Then tweak it and save.</p>
+
+                <div class="field">
+                    <label for="describe">Describe the replies you want</label>
+                    <textarea id="describe" placeholder="e.g. short and friendly, a bit sarcastic. i'm networking with indie hackers and designers, so be warm to people who want to connect"></textarea>
+                </div>
+                <div class="field">
+                    <label for="samples">Replies you actually wrote <span class="hint">(optional, 3–10, one per line)</span></label>
+                    <textarea id="samples" placeholder="yeah exactly&#10;kinda, but it depends on the team&#10;count me in"></textarea>
+                </div>
+                <div class="row">
+                    <button id="generate" class="secondary" type="button">Generate style</button>
+                    <span id="gen-msg" class="msg" role="status"></span>
+                </div>
+
+                <div class="grid">
+                    <div>
+                        <label for="language">Reply language</label>
+                        <select id="language">
+                            <option value="english">English</option>
+                            <option value="ukrainian">Ukrainian</option>
+                            <option value="same_as_post">Same as the post</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="length">Reply length</label>
+                        <select id="length">
+                            <option value="short">Short (often just a few words)</option>
+                            <option value="medium">Medium (a sentence or two)</option>
+                        </select>
+                    </div>
+                </div>
+                <label class="check"><input id="lowercase" type="checkbox" /> all lowercase, no final period</label>
+
+                <h3><label for="style-prompt">Style prompt</label></h3>
+                <textarea id="style-prompt" spellcheck="false"></textarea>
+                <p class="note">Plain instructions and examples. Safety rules (no made-up facts, never mentioning prompts) are added automatically.</p>
+
+                <div class="card">
+                    <h3>Try it</h3>
+                    <label for="try-post" class="hint">Paste a post. Uses the style above, even before you save.</label>
+                    <textarea id="try-post" placeholder="hot take: you don't need kubernetes until you have real traffic"></textarea>
+                    <div class="row">
+                        <button id="try" class="secondary" type="button">Try it</button>
+                        <span id="try-msg" class="msg" role="status"></span>
+                    </div>
+                    <div id="try-reply" class="reply"></div>
+                </div>
+
+                <div class="row">
+                    <button id="save-style" class="primary" type="button">Save style</button>
+                    <button id="reset-style" class="link" type="button">Reset to default</button>
+                    <span id="style-msg" class="msg" role="status"></span>
+                </div>
+            </section>
+
+            <section>
+                <h2>Saved replies</h2>
+                <p>Replies are kept for 14 days, up to 300 posts. Reopening a post shows its saved reply without a new API call.</p>
+                <div class="row">
+                    <button id="clear" class="secondary" type="button">Clear cache</button>
+                    <span id="cache-msg" class="msg" role="status"></span>
+                </div>
+            </section>
+        </main>
+        <script type="module" src="options.js"></script>
+    </body>
+</html>

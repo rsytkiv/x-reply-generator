@@ -1,0 +1,26 @@
+{
+    "name": "x-reply-generator",
+    "version": "0.2.0",
+    "private": true,
+    "type": "module",
+    "description": "Personal Chrome extension that drafts short casual replies for X posts",
+    "scripts": {
+        "build": "node build.mjs",
+        "watch": "node build.mjs --watch",
+        "typecheck": "tsc --noEmit",
+        "test": "vitest run",
+        "e2e": "npm run build && node --experimental-strip-types scripts/e2e.ts",
+        "eval:style": "node --env-file-if-exists=.env --experimental-strip-types scripts/style-eval.ts"
+    },
+    "dependencies": {
+        "@anthropic-ai/sdk": "0.133.0"
+    },
+    "devDependencies": {
+        "@types/chrome": "0.3.5",
+        "esbuild": "0.28.2",
+        "happy-dom": "21.0.1",
+        "playwright-core": "1.63.0",
+        "typescript": "7.0.2",
+        "vitest": "5.0.4"
+    }
+}
