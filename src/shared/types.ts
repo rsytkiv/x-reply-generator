@@ -38,6 +38,8 @@ export type ReplyLength = "short" | "medium";
 export interface StyleSettings {
     /** Free-form style guide (tone, rules, examples). Goes inside <style> in the system prompt. */
     stylePrompt: string;
+    /** Facts the user shares about themselves (role, projects, opinions). Goes inside <about_user>. Empty = none. */
+    aboutMe: string;
     language: ReplyLanguage;
     lowercase: boolean;
     length: ReplyLength;

@@ -350,6 +350,7 @@ await check("saving a style changes new replies and skips old cached ones", asyn
     await opts.fill("#style-prompt", "Voice\n- e2e saved style");
     await opts.selectOption("#length", "medium");
     await opts.uncheck("#lowercase");
+    await opts.fill("#about-me", "e2e builder from ukraine");
     await opts.click("#save-style");
     await opts.locator("#style-msg", { hasText: "saved" }).waitFor();
     await x.bringToFront();
@@ -361,6 +362,7 @@ await check("saving a style changes new replies and skips old cached ones", asyn
     const system = JSON.parse(apiCalls[0]!).system[0].text as string;
     expect(system.includes("<style>\nVoice\n- e2e saved style\n</style>"), "saved style in prompt");
     expect(!system.includes("all lowercase"), "lowercase rule removed");
+    expect(system.endsWith("</style>\n\n<about_user>\ne2e builder from ukraine\n</about_user>"), "about in prompt");
     expect(/^R\d+ idea, number \d+\.$/.test(await replyText(x)), "capitals and period kept when lowercase is off");
     await closePanel(x);
 });
@@ -374,6 +376,11 @@ await check("Reset to default brings the default style back", async () => {
     await opts.reload();
     expect((await opts.inputValue("#style-prompt")).startsWith("Goal\n- the user is growing their network"), "default style");
     expect((await opts.inputValue("#length")) === "short" && (await opts.isChecked("#lowercase")), "default toggles");
+    expect((await opts.inputValue("#about-me")) === "e2e builder from ukraine", "reset keeps about");
+    // Back to the exact default prompt, so the reply cached before the custom style is valid again.
+    await opts.fill("#about-me", "");
+    await opts.click("#save-style");
+    await opts.locator("#style-msg", { hasText: "saved" }).waitFor();
 });
 
 await check("options page counts saved replies", async () => {

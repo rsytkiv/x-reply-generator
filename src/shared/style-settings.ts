@@ -4,12 +4,14 @@ import type { ReplyLanguage, ReplyLength, StyleSettings } from "./types.ts";
 
 export const DEFAULT_STYLE_SETTINGS: StyleSettings = {
     stylePrompt: DEFAULT_STYLE,
+    aboutMe: "",
     language: "english",
     lowercase: true,
     length: "short",
 };
 
 export const MAX_STYLE_CHARS = 8000;
+export const MAX_ABOUT_CHARS = 3000;
 
 const LANGUAGES: ReplyLanguage[] = ["english", "ukrainian", "same_as_post"];
 const LENGTHS: ReplyLength[] = ["short", "medium"];
@@ -20,6 +22,7 @@ export function normalizeStyle(value: unknown): StyleSettings {
     const prompt = typeof v.stylePrompt === "string" ? v.stylePrompt.trim().slice(0, MAX_STYLE_CHARS) : "";
     return {
         stylePrompt: prompt || DEFAULT_STYLE_SETTINGS.stylePrompt,
+        aboutMe: typeof v.aboutMe === "string" ? v.aboutMe.trim().slice(0, MAX_ABOUT_CHARS) : "",
         language: LANGUAGES.includes(v.language as ReplyLanguage) ? (v.language as ReplyLanguage) : DEFAULT_STYLE_SETTINGS.language,
         lowercase: typeof v.lowercase === "boolean" ? v.lowercase : DEFAULT_STYLE_SETTINGS.lowercase,
         length: LENGTHS.includes(v.length as ReplyLength) ? (v.length as ReplyLength) : DEFAULT_STYLE_SETTINGS.length,

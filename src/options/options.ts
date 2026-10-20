@@ -16,6 +16,7 @@ const languageSelect = $<HTMLSelectElement>("language");
 const lengthSelect = $<HTMLSelectElement>("length");
 const lowercaseBox = $<HTMLInputElement>("lowercase");
 const stylePrompt = $<HTMLTextAreaElement>("style-prompt");
+const aboutInput = $<HTMLTextAreaElement>("about-me");
 const styleMsg = $<HTMLSpanElement>("style-msg");
 const tryPost = $<HTMLTextAreaElement>("try-post");
 const tryBtn = $<HTMLButtonElement>("try");
@@ -54,6 +55,7 @@ for (const [id, info] of Object.entries(MODELS)) {
 function formStyle(): StyleSettings {
     return normalizeStyle({
         stylePrompt: stylePrompt.value,
+        aboutMe: aboutInput.value,
         language: languageSelect.value as ReplyLanguage,
         length: lengthSelect.value as ReplyLength,
         lowercase: lowercaseBox.checked,
@@ -62,6 +64,7 @@ function formStyle(): StyleSettings {
 
 function fillStyle(style: StyleSettings): void {
     stylePrompt.value = style.stylePrompt;
+    aboutInput.value = style.aboutMe;
     languageSelect.value = style.language;
     lengthSelect.value = style.length;
     lowercaseBox.checked = style.lowercase;
@@ -154,7 +157,7 @@ $("save-style").addEventListener("click", async () => {
 
 $("reset-style").addEventListener("click", () => {
     if (!confirm("Replace the style with the default one? Your current text will be lost unless you copy it.")) return;
-    fillStyle(DEFAULT_STYLE_SETTINGS);
+    fillStyle({ ...DEFAULT_STYLE_SETTINGS, aboutMe: aboutInput.value });
     say(styleMsg, "default loaded. press save to use it");
 });
 

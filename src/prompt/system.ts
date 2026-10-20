@@ -1,4 +1,5 @@
 import type { ReplyLanguage, StyleSettings } from "../shared/types.ts";
+import { escapeTags } from "./user-message.ts";
 
 // Changing BASE rules or DEFAULT_STYLE: bump PROMPT_VERSION in src/config.ts (tests/prompt.test.ts enforces it).
 // The cache key uses a hash of the built prompt, so saved replies never outlive a style change either way.
@@ -79,12 +80,27 @@ const LANGUAGE_RULE: Record<ReplyLanguage, string> = {
 };
 
 /** Fixed rules every style gets. The user's style can't switch these off. */
-export function buildSystemPrompt(style: Pick<StyleSettings, "stylePrompt" | "language" | "lowercase">): string {
+export function buildSystemPrompt(style: Pick<StyleSettings, "stylePrompt" | "language" | "lowercase"> & Partial<Pick<StyleSettings, "aboutMe">>): string {
     const format = [
         `- ${LANGUAGE_RULE[style.language]}`,
         style.lowercase ? `- all lowercase, including "i" and the first word. no final period` : "",
         "- no em dashes or en dashes. use a comma or nothing",
     ].filter(Boolean);
+
+    const about = style.aboutMe?.trim();
+    const aboutRules = about
+        ? `
+About the user
+- <about_user> is what the user wrote about themselves. these are the only facts about the user you know
+- when a post asks the user something directly (what are you building, what's your stack, where are you from), answer with a real fact from <about_user>, short and specific. never dodge with "can't share" or "whatever you're into"
+- answer only what was asked. a stack question gets the stack, not the product too
+- when an opinion from <about_user> really fits the post, you can take that stance. most replies don't mention the user at all
+- a post that only invites people to connect and asks nothing gets no facts about the user
+- don't pitch the user's product or bring it up when nobody asked
+- never stretch it: no numbers, users, revenue, launches, or progress unless <about_user> says so. a plan or opinion is not something the user already does
+`
+        : "";
+    const aboutBlock = about ? `\n\n<about_user>\n${escapeTags(about)}\n</about_user>` : "";
 
     return `You write one reply to a post on X. The user will copy it, maybe edit it, and post it themselves.
 
@@ -94,7 +110,7 @@ Format
 ${format.join("\n")}
 
 Always
-- never make up the user's experience, income, results, products they use, interests, or personal stories
+- never make up the user's experience, income, results, products they use, interests, or personal stories. facts about the user come only from <about_user>
 - never guess someone's real name from their handle
 - never add facts, numbers, or claims that are not in the post
 
@@ -107,10 +123,10 @@ Input
 - if <previous_replies> is present, write a reply with a different idea or reaction, not a rephrase of those
 - if <length> or <note> is present, follow it
 - <recent_replies> are replies the user posted on other posts. only use them to avoid repeating the same wording
-
+${aboutRules}
 Output only the reply text, nothing else.
 
 <style>
 ${style.stylePrompt.trim()}
-</style>`;
+</style>${aboutBlock}`;
 }

@@ -34,8 +34,9 @@ describe("normalizeStyle", () => {
     it("fills defaults for missing or broken values", () => {
         expect(normalizeStyle(undefined)).toEqual(DEFAULT_STYLE_SETTINGS);
         expect(normalizeStyle({ stylePrompt: "  ", language: "klingon", length: 3, lowercase: "yes" })).toEqual(DEFAULT_STYLE_SETTINGS);
-        expect(normalizeStyle({ stylePrompt: " be kind ", language: "same_as_post", length: "medium", lowercase: false })).toEqual({
+        expect(normalizeStyle({ stylePrompt: " be kind ", aboutMe: " dev ", language: "same_as_post", length: "medium", lowercase: false })).toEqual({
             stylePrompt: "be kind",
+            aboutMe: "dev",
             language: "same_as_post",
             length: "medium",
             lowercase: false,

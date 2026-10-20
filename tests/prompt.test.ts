@@ -19,6 +19,7 @@ const PROMPT_HASHES: Record<number, string> = {
     9: "939bb8e288aa3ebd92a13e7796704686ff768e82fa8dab15cd52e6cf8f6999cd",
     // 10+: hash of buildSystemPrompt(DEFAULT_STYLE_SETTINGS) (base rules + default style)
     10: "a90dda2ff2bf057f9aabf138d857f14830017ed5ee7c4211c31304acc5f3d415",
+    11: "4e0394e2f8837c266a48d017214917645f734f256cbbf23abc6cc739b61c5955",
 };
 
 const post: PostContext = { postId: "1", author: "dev", text: "hot take: tabs > spaces", truncated: false, media: [] };

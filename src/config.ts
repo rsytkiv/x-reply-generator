@@ -8,7 +8,7 @@ export type ModelId = keyof typeof MODELS;
 export const DEFAULT_MODEL: ModelId = "claude-haiku-5-5";
 
 /** Bump when the base rules or DEFAULT_STYLE in src/prompt/system.ts change. A test checks this against the prompt hash. */
-export const PROMPT_VERSION = 10;
+export const PROMPT_VERSION = 11;
 /** Bump when postprocess rules or the user-message format change. */
 export const STYLE_VERSION = 4;
 
